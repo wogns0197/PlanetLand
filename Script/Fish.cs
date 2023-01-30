@@ -7,11 +7,12 @@ public class Fish : MonoBehaviour
     private Rigidbody rg;
     int randSpeed, randRotY, randRepeat;
     bool bAggro;
-    float ExitAggroTime;
+    float ExitAggroTime, RotTime;
     void Start()
     {
         bAggro = false;
         ExitAggroTime = 0;
+        RotTime = 0;
 
         randRepeat = Random.Range(1, 10);
         rg = this.GetComponent<Rigidbody>();
@@ -23,6 +24,9 @@ public class Fish : MonoBehaviour
     
     void Update()
     {
+        // 서서히 회전을 구현해야하는데...이거말고 더 깨끗한 방식 있을건데..
+        // RotTime += Time.deltaTime;
+        // if(RotTime > )
     }
 
     void SetSpeed(int speed = 1)
@@ -43,8 +47,8 @@ public class Fish : MonoBehaviour
     private void OnCollisionEnter(Collision other) 
     {
         // Debug.Log("Col!!" + this.gameObject.name);
-        // SetRotation();
-        // SetSpeed();
+        SetRotation();
+        SetSpeed();
     }
 
     private void InvokeMove()
