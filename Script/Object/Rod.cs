@@ -5,9 +5,10 @@ using UnityEngine;
 public class Rod : MonoBehaviour
 {
     Fish targetFish;
-    bool bAggro;
+    public bool bAggro {get; set;}
     float AggroTime;
     Queue<Collider> QCol;
+    public GameObject RodUI;
     void Start()
     {
         QCol = new Queue<Collider>();
@@ -48,11 +49,18 @@ public class Rod : MonoBehaviour
         if(AggroTime > 4f)
         {
             Debug.Log("Rod Finish ---- " + targetFish.gameObject.name);
-            FinishRodding();
+            StartRodUI();
         }
     }
 
-    private void FinishRodding()
+    private void StartRodUI()
+    {
+        if(RodUI != null && !RodUI.activeSelf)
+        {
+            RodUI.SetActive(true);
+        }
+    }
+    public void OnFinishRodding()
     {
         Destroy(targetFish.gameObject);
         targetFish = null;
