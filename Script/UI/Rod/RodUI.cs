@@ -14,6 +14,7 @@ public class RodUI : MonoBehaviour
 
     void Start()
     {
+        slider.value = 30;
         reduceValue = Random.Range(0.005f, 0.03f);
         Rod = GameObject.Find("Rod").GetComponent<Rod>();
     }
@@ -34,5 +35,10 @@ public class RodUI : MonoBehaviour
         }
 
         slider.value -= reduceValue;
+    }
+
+    public void Init()
+    {
+        Start();
     }
 }

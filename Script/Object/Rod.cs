@@ -58,6 +58,7 @@ public class Rod : MonoBehaviour
         if(RodUI != null && !RodUI.activeSelf)
         {
             RodUI.SetActive(true);
+            RodUI.GetComponent<RodUI>().Init();
         }
     }
     public void OnFinishRodding()
