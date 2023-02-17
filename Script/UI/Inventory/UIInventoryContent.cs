@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-enum EContentsType
+public enum EContentsType
 {
     Usable,
     NotUsable,

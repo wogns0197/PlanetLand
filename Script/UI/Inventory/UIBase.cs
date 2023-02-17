@@ -8,12 +8,22 @@ public class UIBase : MonoBehaviour
 
     void Update() {}
 
-    virtual protected void Close()
+    virtual public void Open()
     {
 
     }
 
-    virtual protected void OnClose()
+    virtual public void OnOpen()
+    {
+
+    }
+
+    virtual public void Close()
+    {
+
+    }
+
+    virtual public void OnClose()
     {
         
     }

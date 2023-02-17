@@ -5,13 +5,13 @@ using UnityEngine.UI;
 using TMPro;
 
 enum EButtonType
-    {
-        All,
-        Fashion,
-        Consume,
-        Equip,
-        Etc,
-    }
+{
+    All,
+    Fashion,
+    Consume,
+    Equip,
+    Etc,
+}
 public class UIInventory : UIBase
 {
     public Button TypeBut0, TypeBut1, TypeBut2, TypeBut3, TypeBut4;
@@ -22,7 +22,16 @@ public class UIInventory : UIBase
     private string UnSelectColor = "#E9E9E9";
     private string SelectColor = "#4795FF";
     EButtonType EBType;
+
+    private List<ItemSlotInfo> ItemContentsArr = new List<ItemSlotInfo>();
+    InventoryInfo II;
     
+    public override void OnOpen()
+    {
+        base.OnOpen();
+        II = PUtility.GetInventoryData();
+    }
+
     void Start()
     {
         TypeBut0.onClick.AddListener(OnClickedBut0);
@@ -36,7 +45,7 @@ public class UIInventory : UIBase
         Tmpro3 = TypeBut3.transform.GetChild(0).GetComponent<TextMeshProUGUI>();
         Tmpro4 = TypeBut4.transform.GetChild(0).GetComponent<TextMeshProUGUI>();
 
-        InitInventory();
+        ResetInventory();
 
     }
     void Update()
@@ -44,11 +53,13 @@ public class UIInventory : UIBase
         
     }
 
-    void InitInventory()
+    void ResetInventory()
     {
         // 여기서 캐릭터 인벤토리 data기준으로 Usable, NotUsable 설정(태그포함) 해주고
         // Usable 설정 이후의 프리팹 프리뷰로 넣어주기
         // 일단 지금은 Usable 4개, Not Usable 12개로 set 해둠
+        // Dummy
+        SetContentsArr();
 
         for (int i = 0; i < ContentBox.transform.childCount; i++)
         {
@@ -58,17 +69,70 @@ public class UIInventory : UIBase
             UIInventoryContent cont = el.GetComponent<UIInventoryContent>();
             if ( cont == null )  { continue; }
 
-            if( i < 4 )
-            {
-                cont.LoadImage();
+            if (i >= ItemContentsArr.Count ) 
+            { 
+                cont.SetNotUsable(); 
                 continue;
             }
 
-            cont.SetNotUsable();
+            else
+            {
+                Sprite texture = PUtility.GetPreview(ItemContentsArr[i].ThumbnailPath);
+                cont.LoadImage(texture);
+            }
         }
     }
 
-    void ReSetButtonType()
+    void SetContentsArr()
+    {
+        // Data 많아지면 무거워질 수 있으니 추후 텀 두고 Load 하도록 수정하자
+        II = PUtility.GetInventoryData();
+        ItemContentsArr.Clear();
+
+        switch (EBType)
+        {
+            case EButtonType.All:
+                // 전부로 돌리는 걸로 해야함
+
+                foreach (var item in II.FashionContents)
+                {
+                    ItemContentsArr.Add(item);
+                }
+
+                foreach (var item in II.ConsumeContents)
+                {
+                    ItemContentsArr.Add(item);
+                }
+
+                foreach (var item in II.EquipContents)
+                {
+                    ItemContentsArr.Add(item);
+                }
+
+                foreach (var item in II.EtcContents)
+                {
+                    ItemContentsArr.Add(item);
+                }
+
+                break;
+            case EButtonType.Fashion:
+                ItemContentsArr = new List<ItemSlotInfo>(II.FashionContents);
+                break;
+            case EButtonType.Consume:
+                ItemContentsArr = new List<ItemSlotInfo>(II.ConsumeContents);
+                break;
+            case EButtonType.Equip:
+                ItemContentsArr = new List<ItemSlotInfo>(II.EquipContents);
+                break;
+            case EButtonType.Etc:
+                ItemContentsArr = new List<ItemSlotInfo>(II.EtcContents);
+                break;
+            default:
+                break;
+        }
+    }
+
+    void ResetButtonType()
     {
         Color color;
         ColorUtility.TryParseHtmlString(UnSelectColor, out color);
@@ -125,31 +189,33 @@ public class UIInventory : UIBase
             default:
                 break;
         }
+
+        ResetInventory();
     }
 
     void OnClickedBut0()
     {
-        ReSetButtonType();
+        ResetButtonType();
         SetButtonType(0);
     }
     void OnClickedBut1()
     {
-        ReSetButtonType();
+        ResetButtonType();
         SetButtonType(1);
     }
     void OnClickedBut2()
     {
-        ReSetButtonType();
+        ResetButtonType();
         SetButtonType(2);
     }
     void OnClickedBut3()
     {
-        ReSetButtonType();
+        ResetButtonType();
         SetButtonType(3);
     }
     void OnClickedBut4()
     {
-        ReSetButtonType();
+        ResetButtonType();
         SetButtonType(4);
     }
 }
