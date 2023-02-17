@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 public enum EContentsType
 {
@@ -14,11 +15,12 @@ public class UIInventoryContent : MonoBehaviour
 {
     private EContentsType ContentsType;
     private Image BackImage, ContentsImage;
-
+    
     private Color32 BackUsableColor, BackNotUsableColor, ContUsableColor, ContNotUsableColor;
 
     // 리소스 로드가 안되어 Sprite 그대로 박아둠
     public Sprite SPNotUsable;
+    public TextMeshProUGUI NumText;
 
     EContentsType GetContentsType () { return ContentsType; }
     void SetType (EContentsType T) { ContentsType = T; }
@@ -31,10 +33,11 @@ public class UIInventoryContent : MonoBehaviour
 
     void Start()
     {
+        NumText.text = "";
         BackUsableColor = new Color32(255, 255, 255, 132);
         BackNotUsableColor = new Color32(232, 232, 232, 100);
-        // ContUsableColor
-        // ContNotUsableColor;
+        // ContUsableColor =;
+        // ContNotUsableColor =;
         BackImage = this.GetComponent<Image>();
         ContentsImage = this.transform.GetChild(0).GetComponent<Image>();
     }
@@ -44,10 +47,17 @@ public class UIInventoryContent : MonoBehaviour
         
     }
 
-    public void LoadImage(Sprite sprite = null)
+    public void LoadData(Sprite sprite = null, int num = 0)
     {
-        BackImage.color = BackUsableColor;
-        ContentsImage.sprite = sprite;
+        ContentsImage.sprite = null;
+
+        if(sprite != null)
+        {
+            BackImage.color = BackUsableColor;
+            ContentsImage.sprite = sprite;   
+        }
+
+        NumText.text = num == 0 ? "" : num.ToString();
     }
 
     public void SetNotUsable()

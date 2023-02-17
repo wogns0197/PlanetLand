@@ -21,6 +21,7 @@ public enum EItemType // max int 64
 [Serializable]
 public struct ItemSlotInfo
 {
+    public int ItemCode;
     public int Count;
     public string Name;
     public EItemType Type;
@@ -47,7 +48,7 @@ public class PUtility : MonoBehaviour
         return II;
     }
 
-    public static Sprite GetPreview(string path)
+    public static Sprite GetPreview(string path, int SN /*SerialNumber*/)
     {
         if(path.Length == 0) { return null; }
         Texture2D tx = null;
@@ -56,9 +57,9 @@ public class PUtility : MonoBehaviour
         GameObject target = Resources.Load(path) as GameObject;
         if (target != null)
         {
-            if (mStaticTexture.ContainsKey(target.GetInstanceID()))
+            if (mStaticTexture.ContainsKey(SN))
             {
-                tx = mStaticTexture[target.GetInstanceID()];
+                tx = mStaticTexture[SN];
             }
 
             else 
@@ -73,7 +74,7 @@ public class PUtility : MonoBehaviour
                     tries--;
                 }
 
-                mStaticTexture[target.GetInstanceID()] = tx;
+                mStaticTexture[SN] = tx;
             }
         }
 

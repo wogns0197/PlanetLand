@@ -14,7 +14,7 @@ enum EButtonType
 }
 public class UIInventory : UIBase
 {
-    public Button TypeBut0, TypeBut1, TypeBut2, TypeBut3, TypeBut4;
+    public Button TypeBut0, TypeBut1, TypeBut2, TypeBut3, TypeBut4, CloseBut;
     public Button ContentsLBut, ContentsRBut;
     public TextMeshProUGUI Tmpro0, Tmpro1, Tmpro2, Tmpro3, Tmpro4;
     public GameObject ContentBox;
@@ -39,6 +39,9 @@ public class UIInventory : UIBase
         TypeBut2.onClick.AddListener(OnClickedBut2);
         TypeBut3.onClick.AddListener(OnClickedBut3);
         TypeBut4.onClick.AddListener(OnClickedBut4);
+        // CloseBut.onClick.AddListener(() => { this.gameObject.SetActive(false); });
+        // Ship의 키로만 on off로 일단 변경 해둠
+
         Tmpro0 = TypeBut0.transform.GetChild(0).GetComponent<TextMeshProUGUI>();
         Tmpro1 = TypeBut1.transform.GetChild(0).GetComponent<TextMeshProUGUI>();
         Tmpro2 = TypeBut2.transform.GetChild(0).GetComponent<TextMeshProUGUI>();
@@ -50,7 +53,6 @@ public class UIInventory : UIBase
     }
     void Update()
     {
-        
     }
 
     void ResetInventory()
@@ -71,14 +73,18 @@ public class UIInventory : UIBase
 
             if (i >= ItemContentsArr.Count ) 
             { 
-                cont.SetNotUsable(); 
+                cont.LoadData(null, 0);
+                cont.SetNotUsable();
                 continue;
             }
 
             else
             {
-                Sprite texture = PUtility.GetPreview(ItemContentsArr[i].ThumbnailPath);
-                cont.LoadImage(texture);
+                if(ItemContentsArr[i].Count > 0)
+                {
+                    Sprite texture = PUtility.GetPreview(ItemContentsArr[i].ThumbnailPath, ItemContentsArr[i].ItemCode);
+                    cont.LoadData(texture, ItemContentsArr[i].Count);
+                }
             }
         }
     }
