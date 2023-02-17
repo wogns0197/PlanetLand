@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-enum ButtonType
+enum EButtonType
     {
         All,
         Fashion,
@@ -21,7 +21,7 @@ public class UIInventory : UIBase
 
     private string UnSelectColor = "#E9E9E9";
     private string SelectColor = "#4795FF";
-    ButtonType EBType;
+    EButtonType EBType;
     
     void Start()
     {
@@ -52,11 +52,23 @@ public class UIInventory : UIBase
 
         for (int i = 0; i < ContentBox.transform.childCount; i++)
         {
-            
+            GameObject el = ContentBox.transform.GetChild(i).gameObject;
+            if( el == null) { continue; }
+
+            UIInventoryContent cont = el.GetComponent<UIInventoryContent>();
+            if ( cont == null )  { continue; }
+
+            if( i < 4 )
+            {
+                cont.LoadImage();
+                continue;
+            }
+
+            cont.SetNotUsable();
         }
     }
 
-    void ResetButtonFocus()
+    void ReSetButtonType()
     {
         Color color;
         ColorUtility.TryParseHtmlString(UnSelectColor, out color);
@@ -78,13 +90,15 @@ public class UIInventory : UIBase
         Tmpro4.color = colorT;
     }
 
-    void SetButtonFocus(int i)
+    void SetButtonType(int i)
     {
         Color color;
         ColorUtility.TryParseHtmlString(SelectColor, out color);
 
         Color colorT;
         ColorUtility.TryParseHtmlString("#ffffff", out colorT);
+
+        EBType = (EButtonType)i;
 
         switch (i)
         {
@@ -115,27 +129,27 @@ public class UIInventory : UIBase
 
     void OnClickedBut0()
     {
-        ResetButtonFocus();
-        SetButtonFocus(0);
+        ReSetButtonType();
+        SetButtonType(0);
     }
     void OnClickedBut1()
     {
-        ResetButtonFocus();
-        SetButtonFocus(1);
+        ReSetButtonType();
+        SetButtonType(1);
     }
     void OnClickedBut2()
     {
-        ResetButtonFocus();
-        SetButtonFocus(2);
+        ReSetButtonType();
+        SetButtonType(2);
     }
     void OnClickedBut3()
     {
-        ResetButtonFocus();
-        SetButtonFocus(3);
+        ReSetButtonType();
+        SetButtonType(3);
     }
     void OnClickedBut4()
     {
-        ResetButtonFocus();
-        SetButtonFocus(4);
+        ReSetButtonType();
+        SetButtonType(4);
     }
 }

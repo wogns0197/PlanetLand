@@ -1,0 +1,50 @@
+{
+    "FashionCount" : 0,
+    "ConsumeCount" : 4,
+    "EquipCount" : 0,
+    "EtcCount" : 0,
+
+    "FashionContents" : [
+        {
+            "Count" : 1,
+            "Name" : "FID_Normal_0",
+            "Type" : "Hat",
+            "ThumbnailPath": ""
+        }
+    ],
+
+    "ConsumeContents" : [
+        {
+            "Count" : 4,
+            "Name" : "Salmon",
+            "Type" : "Fish",
+            "ThumbnailPath": "Assets/Prefab/FishV1.fbx"
+        },
+        {
+            "Count" : 3,
+            "Name" : "Melowy",
+            "Type" : "Fish",
+            "ThumbnailPath": "Assets/Prefab/FishV4.fbx"
+        },
+        {
+            "Count" : 1,
+            "Name" : "Shark",
+            "Type" : "Fish",
+            "ThumbnailPath": "Assets/Prefab/FishV2.fbx"
+        },
+        {
+            "Count" : 1,
+            "Name" : "Gold Turtle",
+            "Type" : "Fish",
+            "ThumbnailPath": "Assets/Prefab/SharkV1.fbx"
+        }
+    ],
+
+    "EquipContents" : [
+
+    ],
+
+    "EtcContents" : [
+
+    ]
+}
