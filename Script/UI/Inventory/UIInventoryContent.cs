@@ -54,7 +54,8 @@ public class UIInventoryContent : MonoBehaviour
         if(sprite != null)
         {
             BackImage.color = BackUsableColor;
-            ContentsImage.sprite = sprite;   
+            ContentsImage.sprite = sprite;
+            SetType(EContentsType.Usable);
         }
 
         NumText.text = num == 0 ? "" : num.ToString();
