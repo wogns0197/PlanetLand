@@ -23,6 +23,11 @@ public class UIInventory : UIBase
     private string SelectColor = "#4795FF";
     EButtonType EBType;
 
+    // ===================================================
+    // test 
+    public Button Button_Test;
+    // ===================================================
+
     private List<ItemSlotInfo> ItemContentsArr = new List<ItemSlotInfo>();
     InventoryInfo II;
     
@@ -34,6 +39,9 @@ public class UIInventory : UIBase
 
     void Start()
     {
+        //test
+        Button_Test.onClick.AddListener(OnClickedTest1);
+
         TypeBut0.onClick.AddListener(OnClickedBut0);
         TypeBut1.onClick.AddListener(OnClickedBut1);
         TypeBut2.onClick.AddListener(OnClickedBut2);
@@ -50,9 +58,21 @@ public class UIInventory : UIBase
 
         ResetInventory();
 
+        DataMgr.OnMoneyUpdate += OnMoneyUpdated;
+
+    }
+
+    void OnClickedTest1()
+    {
+        DataMgr.OnMoneyUpdate(1000);
     }
     void Update()
     {
+    }
+
+    void OnMoneyUpdated(int outDelegateNum)
+    {
+
     }
 
     void ResetInventory()
