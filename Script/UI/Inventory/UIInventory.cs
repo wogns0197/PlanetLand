@@ -68,6 +68,7 @@ public class UIInventory : UIBase
     }
     void Update()
     {
+        
     }
 
     void OnMoneyUpdated(int outDelegateNum)
