@@ -161,9 +161,11 @@ public class Character_Move : MonoBehaviour
     {
         if ( Input.GetKey(KeyCode.Space) )
         {
-            Debug.Log("!!!");
-            this.rg.AddForce(new Vector3(0, 3f, 0));
-            OnJump();
+            if ( this.rg.velocity.y > 0 == false)
+            {
+                this.rg.AddForce(new Vector3(0, 9f, 0));
+                OnJump();
+            }
         }
     }
 
@@ -176,5 +178,14 @@ public class Character_Move : MonoBehaviour
     {
         Debug.Log($"{name} animation complete.");
         OnAnimationComplete?.Invoke(name);
+    }
+
+    private void OnCollisionEnter(Collision other) 
+    {
+        // 캐릭터와 땅 닿는 처리는 땅에 무조건 StepGround 태그를 달아줘야함!!
+        if ( other.gameObject.tag == "StopGround" )
+        {
+            StopJump();
+        }
     }
 }
