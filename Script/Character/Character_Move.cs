@@ -11,7 +11,7 @@ public class Character_Move : MonoBehaviour
 {
     private struct CharacterAnim
     {
-        public bool bIsJump, bIsPickup, bIsRun, bIsWave, bIsWalk;
+        public bool bIsJump, bIsFloat, bIsFallDown, bIsPickup, bIsRun, bIsWave, bIsWalk;
 
         public float fJumpSpeed_up, fJumpSpeed_float, fJumpSpeed_down;
         public float fWalkSpeed, fRunSpeed;
@@ -21,6 +21,8 @@ public class Character_Move : MonoBehaviour
             bool _bIsWalk, float _fJumpSpeed_up, float _fJumpSpeed_float, float _fJumpSpeed_down, float _fWalkSpeed, float _fRunSpeed, float _fWaveSpeed, float _fPickupSpeed)
         {
             this.bIsJump    = _bIsJump;
+            this.bIsFloat   = false;
+            this.bIsFallDown = false;
             this.bIsPickup  = _bIsPickup;
             this.bIsRun     = _bIsRun;
             this.bIsWave    = _bIsWave;
@@ -89,8 +91,19 @@ public class Character_Move : MonoBehaviour
     void StopWalk() { CharacterAnimData.bIsWalk = false; }
     void OnRun()    { CharacterAnimData.bIsRun = true; }
     void StopRun()  { CharacterAnimData.bIsRun = false; }
-    void OnJump()   { CharacterAnimData.bIsJump = true; }
-    void StopJump() { CharacterAnimData.bIsJump = false; }
+    void OnJump()   
+    { 
+        CharacterAnimData.bIsWalk = false;
+        CharacterAnimData.bIsRun = false;
+        CharacterAnimData.bIsJump = true; 
+    }
+
+    void StopJump() 
+    { 
+        CharacterAnimData.bIsJump = false; 
+        CharacterAnimData.bIsFloat = false;
+        CharacterAnimData.bIsFallDown = false;
+    }
     void OnPickUp() { CharacterAnimData.bIsPickup = true; }
     void StopPickUp() { CharacterAnimData.bIsPickup = false; }
     void OnWave()   { CharacterAnimData.bIsWave = true; }
@@ -98,13 +111,14 @@ public class Character_Move : MonoBehaviour
 
     void ProcessAnim()
     {
+        Animator.SetBool("bIsJump", CharacterAnimData.bIsJump );
+        Animator.SetBool("bIsFloat", CharacterAnimData.bIsFloat );
+        Animator.SetBool("bIsFallDown", CharacterAnimData.bIsFallDown );
+
+        
         Animator.SetBool("bIsWalk", CharacterAnimData.bIsWalk );
-        // Allow Only On Walking -- 보류
-        // if ( CharacterAnimData.bIsWalk )
-        {
-            Animator.SetBool("bIsRun", CharacterAnimData.bIsRun );
-            Animator.SetBool("bIsJump", CharacterAnimData.bIsJump );
-        }
+
+        Animator.SetBool("bIsRun", CharacterAnimData.bIsRun );
 
         // Allow Only NOT On Jumping
         if ( !CharacterAnimData.bIsJump )
@@ -159,33 +173,51 @@ public class Character_Move : MonoBehaviour
 
     void Jump()
     {
-        if ( Input.GetKey(KeyCode.Space) )
+        if ( Input.GetKeyDown(KeyCode.Space) )
         {
             if ( this.rg.velocity.y > 0 == false)
             {
-                this.rg.AddForce(new Vector3(0, 9f, 0));
+                this.rg.AddForce(new Vector3(0, 50f, 0));
                 OnJump();
             }
+        }
+
+        // CharacterAnimData.bIsFloat = true;
+        if ( -4f < this.rg.velocity.y && this.rg.velocity.y < -3f && CharacterAnimData.bIsFloat == false )
+        {
+            CharacterAnimData.bIsFloat = true;
+            //Debug.Log("222222222222222");
+        }
+
+        if ( -0.1f < this.rg.velocity.y && this.rg.velocity.y < 0 && CharacterAnimData.bIsFloat == true)
+        {
+            // StopJump();
+            CharacterAnimData.bIsFallDown = true;
         }
     }
 
     public void AnimationStartHandler(string name)
     {
-        Debug.Log($"{name} animation start.");
+        // Debug.Log($"{name} animation start.");
         OnAnimationStart?.Invoke(name);
     }
     public void AnimationCompleteHandler(string name)
     {
-        Debug.Log($"{name} animation complete.");
+        // Debug.Log($"{name} animation complete.");
         OnAnimationComplete?.Invoke(name);
-    }
 
-    private void OnCollisionEnter(Collision other) 
-    {
-        // 캐릭터와 땅 닿는 처리는 땅에 무조건 StepGround 태그를 달아줘야함!!
-        if ( other.gameObject.tag == "StopGround" )
+        if (name == "jump-down")
         {
             StopJump();
         }
     }
+
+    // private void OnCollisionEnter(Collision other) 
+    // {
+    //     // 캐릭터와 땅 닿는 처리는 땅에 무조건 StepGround 태그를 달아줘야함!!
+    //     if ( other.gameObject.tag == "StopGround" )
+    //     {
+    //         StopJump();
+    //     }
+    // }
 }
