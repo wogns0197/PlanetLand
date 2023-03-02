@@ -37,6 +37,7 @@ public class Character_Move : MonoBehaviour
         }
     }
 
+    //move
     CharacterAnim CharacterAnimData;
     public Animator Animator;
     public UnityAnimationEvent OnAnimationStart;
@@ -47,6 +48,12 @@ public class Character_Move : MonoBehaviour
     private Rigidbody rg;
 
     private bool bInputWalk;
+
+
+    //camera
+    public Camera Camera;
+    public GameObject DirObj;
+    private float fRotX, fRotY, fRotSpeed;
 
     void Awake()
     {
@@ -76,6 +83,8 @@ public class Character_Move : MonoBehaviour
         dRotLeft = 0;
         fSpeed = .1f;
         fRodSpeed = 4f;
+
+        fRotSpeed = 400f;
         rg = this.GetComponent<Rigidbody>();
     }
 
@@ -84,6 +93,7 @@ public class Character_Move : MonoBehaviour
         Move();
         Jump();
         ProcessAnim();
+        UpdateCameraInput();
 
         //test
         test();
@@ -135,6 +145,9 @@ public class Character_Move : MonoBehaviour
         // w : 119, s : 115, d : 100, a : 97
         dMoveForward = 0;
         dRotLeft = 0;
+
+        Vector3 dir = new Vector3(0, 0, DirObj.transform.forward.z);
+
         if ( Input.GetKey(KeyCode.W) )
         {
             dMoveForward = 1;
@@ -165,8 +178,9 @@ public class Character_Move : MonoBehaviour
 
         if ( dMoveForward != 0 )
         {
-            this.transform.Translate(new Vector3(0,0,0.1f) * ( dMoveForward == 1 ? 1 : -1 ) * fSpeed );
+            this.transform.Translate(dir * ( dMoveForward == 1 ? 1 : -1 ) * fSpeed );
             OnWalk();
+            Debug.Log(dir);
         }
         else
         {
@@ -231,4 +245,21 @@ public class Character_Move : MonoBehaviour
     //         StopJump();
     //     }
     // }
+
+    // =============================== Camera =================================
+
+    void UpdateCameraInput()
+    {
+        if ( Input.GetMouseButton(1) )
+        {
+            fRotX = Input.GetAxis("Mouse X") * Time.deltaTime * fRotSpeed;
+            fRotY = Input.GetAxis("Mouse Y") * Time.deltaTime * fRotSpeed;
+        }
+
+        Vector3 pos = this.transform.position;
+
+        Camera.transform.RotateAround(pos, Vector3.right, - fRotY);
+        Camera.transform.RotateAround(pos, Vector3.up, - fRotX);
+        Camera.transform.LookAt(pos);
+    }
 }
