@@ -11,7 +11,7 @@ public class Character_Move : MonoBehaviour
 {
     private struct CharacterAnim
     {
-        public bool bIsJump, bIsFloat, bIsFallDown, bIsPickup, bIsRun, bIsWave, bIsWalk;
+        public bool bIsJump, /*bIsFloat,*/ bIsFallDown, bIsPickup, bIsRun, bIsWave, bIsWalk;
 
         public float fJumpSpeed_up, fJumpSpeed_float, fJumpSpeed_down;
         public float fWalkSpeed, fRunSpeed;
@@ -21,7 +21,7 @@ public class Character_Move : MonoBehaviour
             bool _bIsWalk, float _fJumpSpeed_up, float _fJumpSpeed_float, float _fJumpSpeed_down, float _fWalkSpeed, float _fRunSpeed, float _fWaveSpeed, float _fPickupSpeed)
         {
             this.bIsJump    = _bIsJump;
-            this.bIsFloat   = false;
+            //this.bIsFloat   = false;
             this.bIsFallDown = false;
             this.bIsPickup  = _bIsPickup;
             this.bIsRun     = _bIsRun;
@@ -104,7 +104,7 @@ public class Character_Move : MonoBehaviour
     void StopJump() 
     { 
         CharacterAnimData.bIsJump = false; 
-        CharacterAnimData.bIsFloat = false;
+        //CharacterAnimData.bIsFloat = false;
         CharacterAnimData.bIsFallDown = false;
     }
     void OnPickUp() { CharacterAnimData.bIsPickup = true; }
@@ -115,7 +115,7 @@ public class Character_Move : MonoBehaviour
     void ProcessAnim()
     {
         Animator.SetBool("bIsJump", CharacterAnimData.bIsJump );
-        Animator.SetBool("bIsFloat", CharacterAnimData.bIsFloat );
+        //Animator.SetBool("bIsFloat", CharacterAnimData.bIsFloat );
         Animator.SetBool("bIsFallDown", CharacterAnimData.bIsFallDown );
 
         
@@ -178,40 +178,32 @@ public class Character_Move : MonoBehaviour
     {
         if ( Input.GetKeyDown(KeyCode.Space) )
         {
-            if ( this.rg.velocity.y > 0 == false)
+            if ( this.rg.velocity.y > 0 == false && CharacterAnimData.bIsJump == false )
             {
-                this.rg.AddForce(new Vector3(0, 50f, 0));
+                this.rg.AddForce(new Vector3(0, 40f, 0));
                 OnJump();
             }
         }
 
-        // CharacterAnimData.bIsFloat = true;
-        if ( -4f < this.rg.velocity.y && this.rg.velocity.y < -3f && CharacterAnimData.bIsFloat == false )
+        if ( CharacterAnimData.bIsJump && this.rg.velocity.y < -1 )
         {
-            CharacterAnimData.bIsFloat = true;
-            //Debug.Log("222222222222222");
-        }
-
-        if ( -0.1f < this.rg.velocity.y && this.rg.velocity.y < 0 && CharacterAnimData.bIsFloat == true)
-        {
-            // StopJump();
-            CharacterAnimData.bIsFallDown = true;
+            //Debug.DrawRay(transform.position, -transform.up*8,Color.red);
+            RaycastHit hit;
+            if( Physics.Raycast(transform.position , -transform.up* 8, out hit , 8) )
+            {
+                // .5가 매직넘버라 추후에 좀더 높은 곳에서 떨어 질 것을 고려하여 수정해야함
+                // Float 변수 일단 삭제
+                if ( hit.distance <= .5f && CharacterAnimData.bIsFallDown == false)
+                {
+                    CharacterAnimData.bIsFallDown = true;
+                }
+            }
         }
     }
 
     void test()
     {
-        if ( CharacterAnimData.bIsJump )
-        {
-            Debug.DrawRay(transform.position, -transform.up*8,Color.red);
-
-        RaycastHit hit;
-        if(Physics.Raycast(transform.position , -transform.forward, out hit , 8))
-		{
-            Debug.Log(hit.distance);
-            //if (  )
-        }
-        }
+        ;
     }
 
     public void AnimationStartHandler(string name)
@@ -219,6 +211,7 @@ public class Character_Move : MonoBehaviour
         // Debug.Log($"{name} animation start.");
         OnAnimationStart?.Invoke(name);
     }
+
     public void AnimationCompleteHandler(string name)
     {
         // Debug.Log($"{name} animation complete.");
