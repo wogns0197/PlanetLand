@@ -84,6 +84,9 @@ public class Character_Move : MonoBehaviour
         Move();
         Jump();
         ProcessAnim();
+
+        //test
+        test();
     }
     // anim
     // use :::::: animator.SetBool("New Bool", true);
@@ -193,6 +196,21 @@ public class Character_Move : MonoBehaviour
         {
             // StopJump();
             CharacterAnimData.bIsFallDown = true;
+        }
+    }
+
+    void test()
+    {
+        if ( CharacterAnimData.bIsJump )
+        {
+            Debug.DrawRay(transform.position, -transform.up*8,Color.red);
+
+        RaycastHit hit;
+        if(Physics.Raycast(transform.position , -transform.forward, out hit , 8))
+		{
+            Debug.Log(hit.distance);
+            //if (  )
+        }
         }
     }
 
