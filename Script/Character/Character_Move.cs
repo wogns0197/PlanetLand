@@ -146,7 +146,9 @@ public class Character_Move : MonoBehaviour
         dMoveForward = 0;
         dRotLeft = 0;
 
-        Vector3 dir = new Vector3(0, 0, DirObj.transform.forward.z);
+        Vector3 CamPos = Camera.transform.position;
+        Vector3 CharacterPos = this.gameObject.transform.position;
+        Vector3 dir = ( CharacterPos - new Vector3(CamPos.x, CharacterPos.y, CamPos.z )).normalized; 
 
         if ( Input.GetKey(KeyCode.W) )
         {
@@ -180,7 +182,6 @@ public class Character_Move : MonoBehaviour
         {
             this.transform.Translate(dir * ( dMoveForward == 1 ? 1 : -1 ) * fSpeed );
             OnWalk();
-            Debug.Log(dir);
         }
         else
         {
