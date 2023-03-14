@@ -52,8 +52,10 @@ public class Character_Move : MonoBehaviour
 
     //camera
     public Camera Camera;
-    public GameObject DirObj;
     private float fRotX, fRotY, fRotSpeed;
+
+    //ui
+    UIInstance UIInstance;
 
     void Awake()
     {
@@ -86,6 +88,9 @@ public class Character_Move : MonoBehaviour
 
         fRotSpeed = 400f;
         rg = this.GetComponent<Rigidbody>();
+
+        UIInstance = UIInstance.GetUIInstance();
+        // 이거 왜 null??
     }
 
     void Update()
@@ -94,6 +99,7 @@ public class Character_Move : MonoBehaviour
         Jump();
         ProcessAnim();
         UpdateCameraInput();
+        ProcessUIInput();
 
         //test
         test();
@@ -145,11 +151,6 @@ public class Character_Move : MonoBehaviour
         // w : 119, s : 115, d : 100, a : 97
         dMoveForward = 0;
         dRotLeft = 0;
-
-        Vector3 CamPos = Camera.transform.position;
-        Vector3 CharacterPos = this.gameObject.transform.position;
-        Vector3 dir = ( CharacterPos - new Vector3(CamPos.x, CharacterPos.y, CamPos.z )).normalized; 
-
         if ( Input.GetKey(KeyCode.W) )
         {
             dMoveForward = 1;
@@ -180,7 +181,7 @@ public class Character_Move : MonoBehaviour
 
         if ( dMoveForward != 0 )
         {
-            this.transform.Translate(dir * ( dMoveForward == 1 ? 1 : -1 ) * fSpeed );
+            this.transform.Translate(new Vector3(0,0,0.1f) * ( dMoveForward == 1 ? 1 : -1 ) * fSpeed );
             OnWalk();
         }
         else
@@ -251,6 +252,8 @@ public class Character_Move : MonoBehaviour
 
     void UpdateCameraInput()
     {
+        if ( !Input.GetMouseButton(1) ) { return; }
+
         if ( Input.GetMouseButton(1) )
         {
             fRotX = Input.GetAxis("Mouse X") * Time.deltaTime * fRotSpeed;
@@ -259,8 +262,23 @@ public class Character_Move : MonoBehaviour
 
         Vector3 pos = this.transform.position;
 
-        Camera.transform.RotateAround(pos, Vector3.right, - fRotY);
-        Camera.transform.RotateAround(pos, Vector3.up, - fRotX);
+        Camera.transform.RotateAround(pos, Vector3.right * 3, fRotY);
+        Camera.transform.RotateAround(pos, Vector3.up * 3   , fRotX);
         Camera.transform.LookAt(pos);
+    }
+
+    // ================================ UI Input ==============================
+    void ProcessUIInput()
+    {
+        if ( UIInstance == null ) { return; }
+        if ( Input.GetKeyDown(KeyCode.I) )
+        {
+            
+            UIInventory Inventory = (UIInventory)UIInstance.GetUI(EUIType.Inventory);
+            if ( Inventory == null ) { 
+                Debug.Log("!!"); return; }
+
+            Inventory.Open();
+        }
     }
 }

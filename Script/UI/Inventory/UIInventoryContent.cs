@@ -65,6 +65,6 @@ public class UIInventoryContent : MonoBehaviour
     {
         SetType(EContentsType.NotUsable);
         BackImage.color = BackNotUsableColor;
-        ContentsImage.sprite = SPNotUsable;
+        //ContentsImage.sprite = SPNotUsable;
     }
 }

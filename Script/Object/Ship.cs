@@ -54,14 +54,6 @@ public class Ship : MonoBehaviour
         
         // rod ==================
         if (Input.GetKeyDown(KeyCode.Space)) { OnRodStart(); }
-
-        // input
-        // 캐릭터 인풋으로 옮겨야 함!
-        if(Input.GetKeyDown(KeyCode.I))
-        {
-            GameObject Inven = GameObject.Find("Inventory");
-            Inven.GetComponent<Canvas>().enabled = TEMPINVENTORY = !TEMPINVENTORY;
-        }
     }
 
     private void OnRodStart()
