@@ -33,7 +33,6 @@ public class UIInventory : UIBase
     
     public override void OnOpen()
     {
-        base.OnOpen();
         II = PUtility.GetInventoryData();
     }
 

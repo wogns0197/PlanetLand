@@ -90,7 +90,6 @@ public class Character_Move : MonoBehaviour
         rg = this.GetComponent<Rigidbody>();
 
         UIInstance = UIInstance.GetUIInstance();
-        // 이거 왜 null??
     }
 
     void Update()
@@ -273,12 +272,7 @@ public class Character_Move : MonoBehaviour
         if ( UIInstance == null ) { return; }
         if ( Input.GetKeyDown(KeyCode.I) )
         {
-            
-            UIInventory Inventory = (UIInventory)UIInstance.GetUI(EUIType.Inventory);
-            if ( Inventory == null ) { 
-                Debug.Log("!!"); return; }
-
-            Inventory.Open();
+            UIInstance.OpenUI(EUIType.Inventory, UIInstance.IsUIShow(EUIType.Inventory) ? false : true);
         }
     }
 }

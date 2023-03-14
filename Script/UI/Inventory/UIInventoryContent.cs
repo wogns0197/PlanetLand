@@ -31,7 +31,7 @@ public class UIInventoryContent : MonoBehaviour
         // !! Not Usable -> Usable 일땐 무조건 경로 지정하여 프리팹 프리뷰 넣어주도록 하기
     }
 
-    void Start()
+    void Awake()
     {
         NumText.text = "";
         BackUsableColor = new Color32(255, 255, 255, 132);
@@ -49,6 +49,7 @@ public class UIInventoryContent : MonoBehaviour
 
     public void LoadData(Sprite sprite = null, int num = 0)
     {
+        if(ContentsImage == null) { Debug.Log("!!!!!!");}
         ContentsImage.sprite = null;
 
         if(sprite != null)
