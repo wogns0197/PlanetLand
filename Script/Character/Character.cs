@@ -7,8 +7,12 @@ using UnityEngine.Events;
 public class UnityAnimationEvent : UnityEvent<string>{};
 [RequireComponent(typeof(Animator))]
 
-public class Character_Move : MonoBehaviour
+public class Character : MonoBehaviour
 {
+    public delegate void OnTriggerFieldObjectDelegate(EFieldTrigger t);
+
+    public OnTriggerFieldObjectDelegate OnTriggerFieldObject;
+
     private struct CharacterAnim
     {
         public bool bIsJump, /*bIsFloat,*/ bIsFallDown, bIsPickup, bIsRun, bIsWave, bIsWalk;
@@ -59,6 +63,8 @@ public class Character_Move : MonoBehaviour
 
     void Awake()
     {
+        DontDestroyOnLoad(this);
+
         for(int i=0; i < Animator.runtimeAnimatorController.animationClips.Length; i++)
         {
             AnimationClip clip = Animator.runtimeAnimatorController.animationClips[i];
@@ -75,8 +81,11 @@ public class Character_Move : MonoBehaviour
 
             clip.AddEvent(animationStartEvent);
             clip.AddEvent(animationEndEvent);
+
+            OnTriggerFieldObject += new OnTriggerFieldObjectDelegate(OnTriggerFieldObj);
         }
     }
+
     void Start()
     {
         CharacterAnimData = new CharacterAnim(false, false, false, false, false, 1f, 1f, 1f, 1f, 1f, 1f, 1f);
@@ -86,7 +95,7 @@ public class Character_Move : MonoBehaviour
         fSpeed = .1f;
         fRodSpeed = 4f;
 
-        fRotSpeed = 400f;
+        fRotSpeed = 700f;
         rg = this.GetComponent<Rigidbody>();
 
         UIInstance = UIInstance.GetUIInstance();
@@ -257,6 +266,8 @@ public class Character_Move : MonoBehaviour
         {
             fRotX = Input.GetAxis("Mouse X") * Time.deltaTime * fRotSpeed;
             fRotY = Input.GetAxis("Mouse Y") * Time.deltaTime * fRotSpeed;
+
+            //Debug.Log("X = " + Input.GetAxis("Mouse X") + ", Y = " + Input.GetAxis("Mouse Y"));
         }
 
         Vector3 pos = this.transform.position;
@@ -264,6 +275,11 @@ public class Character_Move : MonoBehaviour
         Camera.transform.RotateAround(pos, Vector3.right * 3, fRotY);
         Camera.transform.RotateAround(pos, Vector3.up * 3   , fRotX);
         Camera.transform.LookAt(pos);
+
+        // Camera.transform.rotation = Quaternion.Euler(Mathf.Clamp(Camera.transform.rotation.eulerAngles.x, 5, 70), Camera.transform.rotation.eulerAngles.y, Camera.transform.rotation.eulerAngles.z);
+        if ( Camera.transform.rotation.eulerAngles.x > 70 ) {
+            Camera.transform.rotation = Quaternion.Euler(70, Camera.transform.rotation.eulerAngles.y, Camera.transform.rotation.eulerAngles.z);
+        }
     }
 
     // ================================ UI Input ==============================
@@ -274,5 +290,12 @@ public class Character_Move : MonoBehaviour
         {
             UIInstance.OpenUI(EUIType.Inventory, UIInstance.IsUIShow(EUIType.Inventory) ? false : true);
         }
+    }
+
+
+    // =============================== Trigger FieldObj =======================
+    void OnTriggerFieldObj(EFieldTrigger type)
+    {
+        Debug.Log(type);
     }
 }
