@@ -7,11 +7,12 @@ public class Portal : FieldObject
     bool bTriggered;
     float TriggerTime;
 
-    GameObject GO = null;
     void Start()
     {
         TriggerTime = 0f;
+        _Type = EFieldTrigger.Portal;
     }
+
     void Update()
     {
         if ( bTriggered ) {
@@ -23,31 +24,20 @@ public class Portal : FieldObject
             Character character = GO.GetComponent<Character>();
             if ( character != null ) 
             {
-                character.OnTriggerFieldObject(GetType());
+                character.OnTriggerFieldObject(_Type);
                 bTriggered = false;
                 TriggerTime = 0;
             }
         }
     }
 
-    public override void Init ()
+    protected override void OnCollEnter(Collision other)
     {
-        _Type = EFieldTrigger.Portal;
+        bTriggered = true;
     }
 
-    private void OnCollisionEnter(Collision other) {
-        if ( other.gameObject.tag == "Character" ) 
-        {
-            bTriggered = true;
-            GO = other.gameObject;
-        }
-    }
-
-    private void OnCollisionExit(Collision other) {
-        if ( other.gameObject.tag == "Character" )
-        {
-            TriggerTime = 0f;
-            GO = null;
-        }
+    protected override void OnCollExit(Collision other)
+    {
+        TriggerTime = 0f;
     }
 }

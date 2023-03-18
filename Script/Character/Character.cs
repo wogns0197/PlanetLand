@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.SceneManagement;
 
 [System.Serializable]
 public class UnityAnimationEvent : UnityEvent<string>{};
@@ -81,9 +82,10 @@ public class Character : MonoBehaviour
 
             clip.AddEvent(animationStartEvent);
             clip.AddEvent(animationEndEvent);
-
-            OnTriggerFieldObject += new OnTriggerFieldObjectDelegate(OnTriggerFieldObj);
         }
+
+        OnTriggerFieldObject = new OnTriggerFieldObjectDelegate(OnTriggerFieldObj);
+        SceneManager.sceneLoaded += OnSceneLoaded;
     }
 
     void Start()
@@ -296,6 +298,29 @@ public class Character : MonoBehaviour
     // =============================== Trigger FieldObj =======================
     void OnTriggerFieldObj(EFieldTrigger type)
     {
-        Debug.Log(type);
+        switch (type)
+        {
+            case EFieldTrigger.None:
+                break;
+            case EFieldTrigger.Vehicle:
+                break;
+            case EFieldTrigger.PickUp:
+                break;
+            case EFieldTrigger.Portal:
+                OnMoveMapbyPortal();
+                break;
+            default:
+                break;
+        }
+    }
+
+    void OnMoveMapbyPortal()
+    {
+        SceneManager.LoadScene("SeaPlanet");
+    }
+
+    void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        this.transform.position = new Vector3(0, 5, 0); // 맵 마다 생성 포지션 다르게 해야함
     }
 }

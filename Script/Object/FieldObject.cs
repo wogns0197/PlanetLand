@@ -12,27 +12,40 @@ public enum EFieldTrigger
 
 public class FieldObject : MonoBehaviour
 {
+    protected GameObject GO = null;
     protected EFieldTrigger _Type;
     void Load() {}
     void OnLoad() {}
-
-    public virtual void Init()
-    {
-        _Type = EFieldTrigger.None;
-    }
-
-    public EFieldTrigger GetType() { return _Type; }
     private void OnDestroy() {
         
     }
     void Start()
     {
-        Init();
     }
 
-    // Update is called once per frame
     void Update()
-    {
-        
+    {    
+    }
+
+    protected virtual void OnCollEnter(Collision other) {}
+
+    protected virtual void OnCollExit(Collision other) {}
+
+    private  void OnCollisionEnter(Collision other) {
+        if ( other.gameObject.tag == "Character" ) 
+        {
+            GO = other.gameObject;
+        }
+
+        OnCollEnter(other);
+    }
+
+    private void OnCollisionExit(Collision other) {
+        if ( other.gameObject.tag == "Character" )
+        {
+            GO = null;
+        }
+
+        OnCollExit(other);
     }
 }

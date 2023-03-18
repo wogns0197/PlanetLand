@@ -1858,8 +1858,8 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 963194225}
-  m_LocalRotation: {x: 0.30631065, y: -0.63731784, z: 0.3063109, w: 0.6373174}
-  m_LocalPosition: {x: -0.14305168, y: 18.888693, z: 23.89001}
+  m_LocalRotation: {x: 0.30631056, y: -0.637318, z: 0.30631098, w: 0.6373172}
+  m_LocalPosition: {x: -0.14305145, y: 18.88869, z: 23.890005}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 857316466}
@@ -3162,8 +3162,8 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1365740018}
-  m_LocalRotation: {x: 0.30631065, y: -0.63731784, z: 0.3063109, w: 0.6373174}
-  m_LocalPosition: {x: -0.14305168, y: 18.888693, z: 23.89001}
+  m_LocalRotation: {x: 0.30631056, y: -0.637318, z: 0.30631098, w: 0.6373172}
+  m_LocalPosition: {x: -0.14305145, y: 18.88869, z: 23.890005}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1063587016}
@@ -3189,8 +3189,8 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!136 &1476805747
-CapsuleCollider:
+--- !u!64 &1476805747
+MeshCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -3199,10 +3199,10 @@ CapsuleCollider:
   m_Material: {fileID: 0}
   m_IsTrigger: 0
   m_Enabled: 1
-  m_Radius: 0.5000001
-  m_Height: 2
-  m_Direction: 1
-  m_Center: {x: 0.000000059604645, y: 0, z: -0.00000008940697}
+  serializedVersion: 4
+  m_Convex: 1
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 10206, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!23 &1476805748
 MeshRenderer:
   m_ObjectHideFlags: 0
