@@ -10,317 +10,325 @@ public class UnityAnimationEvent : UnityEvent<string>{};
 
 public class Character : MonoBehaviour
 {
-    public delegate void OnTriggerFieldObjectDelegate(EFieldTrigger t);
+public delegate void OnTriggerFieldObjectDelegate(EFieldTrigger t);
 
-    public OnTriggerFieldObjectDelegate OnTriggerFieldObject;
+public OnTriggerFieldObjectDelegate OnTriggerFieldObject;
 
-    private struct CharacterAnim
+private struct CharacterAnim
+{
+    public bool bIsJump, /*bIsFloat,*/ bIsFallDown, bIsPickup, bIsRun, bIsWave, bIsWalk;
+
+    public float fJumpSpeed_up, fJumpSpeed_float, fJumpSpeed_down;
+    public float fWalkSpeed, fRunSpeed;
+    public float fWaveSpeed, fPickupSpeed;
+
+    public CharacterAnim(bool _bIsJump, bool _bIsPickup, bool _bIsRun, bool _bIsWave,
+        bool _bIsWalk, float _fJumpSpeed_up, float _fJumpSpeed_float, float _fJumpSpeed_down, float _fWalkSpeed, float _fRunSpeed, float _fWaveSpeed, float _fPickupSpeed)
     {
-        public bool bIsJump, /*bIsFloat,*/ bIsFallDown, bIsPickup, bIsRun, bIsWave, bIsWalk;
-
-        public float fJumpSpeed_up, fJumpSpeed_float, fJumpSpeed_down;
-        public float fWalkSpeed, fRunSpeed;
-        public float fWaveSpeed, fPickupSpeed;
-
-        public CharacterAnim(bool _bIsJump, bool _bIsPickup, bool _bIsRun, bool _bIsWave,
-            bool _bIsWalk, float _fJumpSpeed_up, float _fJumpSpeed_float, float _fJumpSpeed_down, float _fWalkSpeed, float _fRunSpeed, float _fWaveSpeed, float _fPickupSpeed)
-        {
-            this.bIsJump    = _bIsJump;
-            //this.bIsFloat   = false;
-            this.bIsFallDown = false;
-            this.bIsPickup  = _bIsPickup;
-            this.bIsRun     = _bIsRun;
-            this.bIsWave    = _bIsWave;
-            this.bIsWalk    = _bIsWalk;
-            this.fJumpSpeed_up = _fJumpSpeed_up;
-            this.fJumpSpeed_float = _fJumpSpeed_float;
-            this.fJumpSpeed_down = _fJumpSpeed_down;
-            this.fWalkSpeed = _fWalkSpeed;
-            this.fRunSpeed = _fRunSpeed;
-            this.fWaveSpeed = _fWaveSpeed;
-            this.fPickupSpeed = _fPickupSpeed;
-        }
+        this.bIsJump    = _bIsJump;
+        //this.bIsFloat   = false;
+        this.bIsFallDown = false;
+        this.bIsPickup  = _bIsPickup;
+        this.bIsRun     = _bIsRun;
+        this.bIsWave    = _bIsWave;
+        this.bIsWalk    = _bIsWalk;
+        this.fJumpSpeed_up = _fJumpSpeed_up;
+        this.fJumpSpeed_float = _fJumpSpeed_float;
+        this.fJumpSpeed_down = _fJumpSpeed_down;
+        this.fWalkSpeed = _fWalkSpeed;
+        this.fRunSpeed = _fRunSpeed;
+        this.fWaveSpeed = _fWaveSpeed;
+        this.fPickupSpeed = _fPickupSpeed;
     }
+}
 
-    //move
-    CharacterAnim CharacterAnimData;
-    public Animator Animator;
-    public UnityAnimationEvent OnAnimationStart;
-    public UnityAnimationEvent OnAnimationComplete;
+//move
+CharacterAnim CharacterAnimData;
+public Animator Animator;
+public UnityAnimationEvent OnAnimationStart;
+public UnityAnimationEvent OnAnimationComplete;
 
-    private float x, y, fSpeed, fRodSpeed;
-    private int dMoveForward, dRotLeft;
-    private Rigidbody rg;
+private float x, y, fSpeed, fRodSpeed;
+private int dMoveForward, dRotLeft;
+private Rigidbody rg;
 
-    private bool bInputWalk;
+private bool bInputWalk;
 
 
-    //camera
-    public Camera Camera;
-    private float fRotX, fRotY, fRotSpeed;
+//camera
+public Camera Camera;
+private float fRotX, fRotY, fRotSpeed;
 
-    //ui
-    UIInstance UIInstance;
+//ui
+UIInstance UIInstance;
 
-    void Awake()
+void Awake()
+{
+    DontDestroyOnLoad(this);
+
+    for(int i=0; i < Animator.runtimeAnimatorController.animationClips.Length; i++)
     {
-        DontDestroyOnLoad(this);
+        AnimationClip clip = Animator.runtimeAnimatorController.animationClips[i];
 
-        for(int i=0; i < Animator.runtimeAnimatorController.animationClips.Length; i++)
-        {
-            AnimationClip clip = Animator.runtimeAnimatorController.animationClips[i];
+        AnimationEvent animationStartEvent = new AnimationEvent();
+        animationStartEvent.time = 0;
+        animationStartEvent.functionName = "AnimationStartHandler";
+        animationStartEvent.stringParameter = clip.name;
 
-            AnimationEvent animationStartEvent = new AnimationEvent();
-            animationStartEvent.time = 0;
-            animationStartEvent.functionName = "AnimationStartHandler";
-            animationStartEvent.stringParameter = clip.name;
+        AnimationEvent animationEndEvent = new AnimationEvent();
+        animationEndEvent.time = clip.length;
+        animationEndEvent.functionName = "AnimationCompleteHandler";
+        animationEndEvent.stringParameter = clip.name;
 
-            AnimationEvent animationEndEvent = new AnimationEvent();
-            animationEndEvent.time = clip.length;
-            animationEndEvent.functionName = "AnimationCompleteHandler";
-            animationEndEvent.stringParameter = clip.name;
-
-            clip.AddEvent(animationStartEvent);
-            clip.AddEvent(animationEndEvent);
-        }
-
-        OnTriggerFieldObject = new OnTriggerFieldObjectDelegate(OnTriggerFieldObj);
-        SceneManager.sceneLoaded += OnSceneLoaded;
+        clip.AddEvent(animationStartEvent);
+        clip.AddEvent(animationEndEvent);
     }
 
-    void Start()
+    OnTriggerFieldObject = new OnTriggerFieldObjectDelegate(OnTriggerFieldObj);
+    SceneManager.sceneLoaded += OnSceneLoaded;
+}
+
+void Start()
+{
+    CharacterAnimData = new CharacterAnim(false, false, false, false, false, 1f, 1f, 1f, 1f, 1f, 1f, 1f);
+
+    dMoveForward = 0;
+    dRotLeft = 0;
+    fSpeed = .1f;
+    fRodSpeed = 4f;
+
+    fRotSpeed = 700f;
+    rg = this.GetComponent<Rigidbody>();
+
+    UIInstance = UIInstance.GetUIInstance();
+}
+
+void Update()
+{
+    Move();
+    Jump();
+    ProcessAnim();
+    UpdateCameraInput();
+    ProcessUIInput();
+
+    //test
+    test();
+}
+// anim
+// use :::::: animator.SetBool("New Bool", true);
+void OnWalk()   { CharacterAnimData.bIsWalk = true; }
+void StopWalk() { CharacterAnimData.bIsWalk = false; }
+void OnRun()    { CharacterAnimData.bIsRun = true; }
+void StopRun()  { CharacterAnimData.bIsRun = false; }
+void OnJump()   
+{ 
+    CharacterAnimData.bIsWalk = false;
+    CharacterAnimData.bIsRun = false;
+    CharacterAnimData.bIsJump = true; 
+}
+
+void StopJump() 
+{ 
+    CharacterAnimData.bIsJump = false; 
+    //CharacterAnimData.bIsFloat = false;
+    CharacterAnimData.bIsFallDown = false;
+}
+void OnPickUp() { CharacterAnimData.bIsPickup = true; }
+void StopPickUp() { CharacterAnimData.bIsPickup = false; }
+void OnWave()   { CharacterAnimData.bIsWave = true; }
+void StopWave()   { CharacterAnimData.bIsWave = false; }
+
+void ProcessAnim()
+{
+    Animator.SetBool("bIsJump", CharacterAnimData.bIsJump );
+    //Animator.SetBool("bIsFloat", CharacterAnimData.bIsFloat );
+    Animator.SetBool("bIsFallDown", CharacterAnimData.bIsFallDown );
+
+    
+    Animator.SetBool("bIsWalk", CharacterAnimData.bIsWalk );
+
+    Animator.SetBool("bIsRun", CharacterAnimData.bIsRun );
+
+    // Allow Only NOT On Jumping
+    if ( !CharacterAnimData.bIsJump )
     {
-        CharacterAnimData = new CharacterAnim(false, false, false, false, false, 1f, 1f, 1f, 1f, 1f, 1f, 1f);
-
-        dMoveForward = 0;
-        dRotLeft = 0;
-        fSpeed = .1f;
-        fRodSpeed = 4f;
-
-        fRotSpeed = 700f;
-        rg = this.GetComponent<Rigidbody>();
-
-        UIInstance = UIInstance.GetUIInstance();
+        Animator.SetBool("bIsWave", CharacterAnimData.bIsWave );
+        Animator.SetBool("bIsPickup", CharacterAnimData.bIsPickup );
     }
-
-    void Update()
+}
+void Move()
+{
+    // w : 119, s : 115, d : 100, a : 97
+    dMoveForward = 0;
+    dRotLeft = 0;
+    if ( Input.GetKey(KeyCode.W) )
     {
-        Move();
-        Jump();
-        ProcessAnim();
-        UpdateCameraInput();
-        ProcessUIInput();
-
-        //test
-        test();
-    }
-    // anim
-    // use :::::: animator.SetBool("New Bool", true);
-    void OnWalk()   { CharacterAnimData.bIsWalk = true; }
-    void StopWalk() { CharacterAnimData.bIsWalk = false; }
-    void OnRun()    { CharacterAnimData.bIsRun = true; }
-    void StopRun()  { CharacterAnimData.bIsRun = false; }
-    void OnJump()   
-    { 
-        CharacterAnimData.bIsWalk = false;
-        CharacterAnimData.bIsRun = false;
-        CharacterAnimData.bIsJump = true; 
+        dMoveForward = 1;
     }
 
-    void StopJump() 
-    { 
-        CharacterAnimData.bIsJump = false; 
-        //CharacterAnimData.bIsFloat = false;
-        CharacterAnimData.bIsFallDown = false;
-    }
-    void OnPickUp() { CharacterAnimData.bIsPickup = true; }
-    void StopPickUp() { CharacterAnimData.bIsPickup = false; }
-    void OnWave()   { CharacterAnimData.bIsWave = true; }
-    void StopWave()   { CharacterAnimData.bIsWave = false; }
-
-    void ProcessAnim()
+    else if ( Input.GetKey(KeyCode.S) )
     {
-        Animator.SetBool("bIsJump", CharacterAnimData.bIsJump );
-        //Animator.SetBool("bIsFloat", CharacterAnimData.bIsFloat );
-        Animator.SetBool("bIsFallDown", CharacterAnimData.bIsFallDown );
-
-        
-        Animator.SetBool("bIsWalk", CharacterAnimData.bIsWalk );
-
-        Animator.SetBool("bIsRun", CharacterAnimData.bIsRun );
-
-        // Allow Only NOT On Jumping
-        if ( !CharacterAnimData.bIsJump )
-        {
-            Animator.SetBool("bIsWave", CharacterAnimData.bIsWave );
-            Animator.SetBool("bIsPickup", CharacterAnimData.bIsPickup );
-        }
+        dMoveForward = -1;
     }
-    void Move()
+    
+    if(Input.GetKey(KeyCode.D))
     {
-        // w : 119, s : 115, d : 100, a : 97
-        dMoveForward = 0;
-        dRotLeft = 0;
-        if ( Input.GetKey(KeyCode.W) )
-        {
-            dMoveForward = 1;
-        }
+        dRotLeft = 1;
+    }   
+    else if(Input.GetKey(KeyCode.A)){
+        dRotLeft = -1;
+    }
 
-        else if ( Input.GetKey(KeyCode.S) )
-        {
-            dMoveForward = -1;
-        }
-        
-        if(Input.GetKey(KeyCode.D))
-        {
-            dRotLeft = 1;
-     	}   
-     	else if(Input.GetKey(KeyCode.A)){
-            dRotLeft = -1;
-        }
+    if ( dRotLeft != 0 )
+    {
+        this.transform.Rotate(new Vector3(0,0.1f,0) * ( dRotLeft == 1 ? 1 : -1 ) * fRodSpeed );
+        OnWalk();
+    }
+    else
+    {
+        StopWalk();
+    }
 
-        if ( dRotLeft != 0 )
-        {
-            this.transform.Rotate(new Vector3(0,0.1f,0) * ( dRotLeft == 1 ? 1 : -1 ) * fRodSpeed );
-            OnWalk();
-        }
-        else
-        {
-            StopWalk();
-        }
+    if ( dMoveForward != 0 )
+    {
+        this.transform.Translate(new Vector3(0,0,0.1f) * ( dMoveForward == 1 ? 1 : -1 ) * fSpeed );
+        OnWalk();
+    }
+    else
+    {
+        StopWalk();
+    }
+}
 
-        if ( dMoveForward != 0 )
+void Jump()
+{
+    if ( Input.GetKeyDown(KeyCode.Space) )
+    {
+        if ( this.rg.velocity.y > 0 == false && CharacterAnimData.bIsJump == false )
         {
-            this.transform.Translate(new Vector3(0,0,0.1f) * ( dMoveForward == 1 ? 1 : -1 ) * fSpeed );
-            OnWalk();
-        }
-        else
-        {
-            StopWalk();
+            this.rg.AddForce(new Vector3(0, 40f, 0));
+            OnJump();
         }
     }
 
-    void Jump()
+    if ( CharacterAnimData.bIsJump && this.rg.velocity.y < -1 )
     {
-        if ( Input.GetKeyDown(KeyCode.Space) )
+        //Debug.DrawRay(transform.position, -transform.up*8,Color.red);
+        RaycastHit hit;
+        if( Physics.Raycast(transform.position , -transform.up* 8, out hit , 8) )
         {
-            if ( this.rg.velocity.y > 0 == false && CharacterAnimData.bIsJump == false )
+            // .5가 매직넘버라 추후에 좀더 높은 곳에서 떨어 질 것을 고려하여 수정해야함
+            // Float 변수 일단 삭제
+            if ( hit.distance <= .5f && CharacterAnimData.bIsFallDown == false)
             {
-                this.rg.AddForce(new Vector3(0, 40f, 0));
-                OnJump();
+                CharacterAnimData.bIsFallDown = true;
             }
         }
-
-        if ( CharacterAnimData.bIsJump && this.rg.velocity.y < -1 )
-        {
-            //Debug.DrawRay(transform.position, -transform.up*8,Color.red);
-            RaycastHit hit;
-            if( Physics.Raycast(transform.position , -transform.up* 8, out hit , 8) )
-            {
-                // .5가 매직넘버라 추후에 좀더 높은 곳에서 떨어 질 것을 고려하여 수정해야함
-                // Float 변수 일단 삭제
-                if ( hit.distance <= .5f && CharacterAnimData.bIsFallDown == false)
-                {
-                    CharacterAnimData.bIsFallDown = true;
-                }
-            }
-        }
     }
+}
 
-    void test()
+void test()
+{
+    ;
+}
+
+public void AnimationStartHandler(string name)
+{
+    // Debug.Log($"{name} animation start.");
+    OnAnimationStart?.Invoke(name);
+}
+
+public void AnimationCompleteHandler(string name)
+{
+    // Debug.Log($"{name} animation complete.");
+    OnAnimationComplete?.Invoke(name);
+
+    if (name == "jump-down")
     {
-        ;
+        StopJump();
     }
+}
 
-    public void AnimationStartHandler(string name)
+// private void OnCollisionEnter(Collision other) 
+// {
+//     // 캐릭터와 땅 닿는 처리는 땅에 무조건 StepGround 태그를 달아줘야함!!
+//     if ( other.gameObject.tag == "StopGround" )
+//     {
+//         StopJump();
+//     }
+// }
+
+// =============================== Camera =================================
+
+void UpdateCameraInput()
+{
+    if ( !Input.GetMouseButton(1) ) { return; }
+
+    if ( Input.GetMouseButton(1) )
     {
-        // Debug.Log($"{name} animation start.");
-        OnAnimationStart?.Invoke(name);
+        fRotX = Input.GetAxis("Mouse X") * Time.deltaTime * fRotSpeed;
+        fRotY = Input.GetAxis("Mouse Y") * Time.deltaTime * fRotSpeed;
+
+        //Debug.Log("X = " + Input.GetAxis("Mouse X") + ", Y = " + Input.GetAxis("Mouse Y"));
     }
 
-    public void AnimationCompleteHandler(string name)
+    Vector3 pos = this.transform.position;
+
+    Camera.transform.RotateAround(pos, Vector3.right * 3, fRotY);
+    Camera.transform.RotateAround(pos, Vector3.up * 3   , fRotX);
+    Camera.transform.LookAt(pos);
+
+    // Camera.transform.rotation = Quaternion.Euler(Mathf.Clamp(Camera.transform.rotation.eulerAngles.x, 5, 70), Camera.transform.rotation.eulerAngles.y, Camera.transform.rotation.eulerAngles.z);
+    if ( Camera.transform.rotation.eulerAngles.x > 70 ) {
+        Camera.transform.rotation = Quaternion.Euler(70, Camera.transform.rotation.eulerAngles.y, Camera.transform.rotation.eulerAngles.z);
+    }
+}
+
+// ================================ UI Input ==============================
+void ProcessUIInput()
+{
+    if ( UIInstance == null ) { return; }
+    if ( Input.GetKeyDown(KeyCode.I) )
     {
-        // Debug.Log($"{name} animation complete.");
-        OnAnimationComplete?.Invoke(name);
-
-        if (name == "jump-down")
-        {
-            StopJump();
-        }
+        UIInstance.OpenUI(EUIType.Inventory, UIInstance.IsUIShow(EUIType.Inventory) ? false : true);
     }
+}
 
-    // private void OnCollisionEnter(Collision other) 
-    // {
-    //     // 캐릭터와 땅 닿는 처리는 땅에 무조건 StepGround 태그를 달아줘야함!!
-    //     if ( other.gameObject.tag == "StopGround" )
-    //     {
-    //         StopJump();
-    //     }
-    // }
 
-    // =============================== Camera =================================
-
-    void UpdateCameraInput()
+// =============================== Trigger FieldObj =======================
+void OnTriggerFieldObj(EFieldTrigger type)
+{
+    switch (type)
     {
-        if ( !Input.GetMouseButton(1) ) { return; }
-
-        if ( Input.GetMouseButton(1) )
-        {
-            fRotX = Input.GetAxis("Mouse X") * Time.deltaTime * fRotSpeed;
-            fRotY = Input.GetAxis("Mouse Y") * Time.deltaTime * fRotSpeed;
-
-            //Debug.Log("X = " + Input.GetAxis("Mouse X") + ", Y = " + Input.GetAxis("Mouse Y"));
-        }
-
-        Vector3 pos = this.transform.position;
-
-        Camera.transform.RotateAround(pos, Vector3.right * 3, fRotY);
-        Camera.transform.RotateAround(pos, Vector3.up * 3   , fRotX);
-        Camera.transform.LookAt(pos);
-
-        // Camera.transform.rotation = Quaternion.Euler(Mathf.Clamp(Camera.transform.rotation.eulerAngles.x, 5, 70), Camera.transform.rotation.eulerAngles.y, Camera.transform.rotation.eulerAngles.z);
-        if ( Camera.transform.rotation.eulerAngles.x > 70 ) {
-            Camera.transform.rotation = Quaternion.Euler(70, Camera.transform.rotation.eulerAngles.y, Camera.transform.rotation.eulerAngles.z);
-        }
+        case EFieldTrigger.None:
+            break;
+        case EFieldTrigger.Vehicle:
+            break;
+        case EFieldTrigger.PickUp:
+            break;
+        case EFieldTrigger.Portal:
+            OnMoveMapbyPortal();
+            break;
+        default:
+            break;
     }
+}
 
-    // ================================ UI Input ==============================
-    void ProcessUIInput()
+private void OnCollisionEnter(Collision other) 
+{
+    if ( other.gameObject.layer == LayerMask.NameToLayer("Water") )
     {
-        if ( UIInstance == null ) { return; }
-        if ( Input.GetKeyDown(KeyCode.I) )
-        {
-            UIInstance.OpenUI(EUIType.Inventory, UIInstance.IsUIShow(EUIType.Inventory) ? false : true);
-        }
+        // InventoryInfo II = PUtility.GetInventoryData();
     }
+}
 
+void OnMoveMapbyPortal()
+{
+    SceneManager.LoadScene("SeaPlanet");
+}
 
-    // =============================== Trigger FieldObj =======================
-    void OnTriggerFieldObj(EFieldTrigger type)
-    {
-        switch (type)
-        {
-            case EFieldTrigger.None:
-                break;
-            case EFieldTrigger.Vehicle:
-                break;
-            case EFieldTrigger.PickUp:
-                break;
-            case EFieldTrigger.Portal:
-                OnMoveMapbyPortal();
-                break;
-            default:
-                break;
-        }
-    }
-
-    void OnMoveMapbyPortal()
-    {
-        SceneManager.LoadScene("SeaPlanet");
-    }
-
-    void OnSceneLoaded(Scene scene, LoadSceneMode mode)
-    {
-        this.transform.position = new Vector3(0, 5, 0); // 맵 마다 생성 포지션 다르게 해야함
-    }
+void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+{
+    this.transform.position = new Vector3(0, 5, 0); // 맵 마다 생성 포지션 다르게 해야함
+}
 }

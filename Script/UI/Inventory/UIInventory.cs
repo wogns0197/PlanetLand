@@ -4,9 +4,9 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-enum EButtonType
+enum EInventorytype
 {
-    All,
+    All = 0,
     Fashion,
     Consume,
     Equip,
@@ -21,7 +21,7 @@ public class UIInventory : UIBase
 
     private string UnSelectColor = "#E9E9E9";
     private string SelectColor = "#4795FF";
-    EButtonType EBType;
+    EInventorytype EBType;
 
     // ===================================================
     // test 
@@ -29,10 +29,13 @@ public class UIInventory : UIBase
     // ===================================================
 
     private List<ItemSlotInfo> ItemContentsArr = new List<ItemSlotInfo>();
-    InventoryInfo II;
+    public static Dictionary<EItemType, Dictionary<int, ItemSlotInfo>> II;
     
     public override void OnOpen()
     {
+        // !!!!!!!!!!!
+        // 매번 열 때마다 말고 변경사항있으면 로드해야함
+        // !!!!!!!!!!!!
         II = PUtility.GetInventoryData();
     }
 
@@ -115,46 +118,23 @@ public class UIInventory : UIBase
         II = PUtility.GetInventoryData();
         ItemContentsArr.Clear();
 
-        switch (EBType)
+        if ( EBType == EInventorytype.All )
         {
-            case EButtonType.All:
-                // 전부로 돌리는 걸로 해야함
-
-                foreach (var item in II.FashionContents)
+            foreach (var el in II)
+            {
+                foreach (var val in el.Value)
                 {
-                    ItemContentsArr.Add(item);
+                    ItemContentsArr.Add(val.Value);
                 }
-
-                foreach (var item in II.ConsumeContents)
-                {
-                    ItemContentsArr.Add(item);
-                }
-
-                foreach (var item in II.EquipContents)
-                {
-                    ItemContentsArr.Add(item);
-                }
-
-                foreach (var item in II.EtcContents)
-                {
-                    ItemContentsArr.Add(item);
-                }
-
-                break;
-            case EButtonType.Fashion:
-                ItemContentsArr = new List<ItemSlotInfo>(II.FashionContents);
-                break;
-            case EButtonType.Consume:
-                ItemContentsArr = new List<ItemSlotInfo>(II.ConsumeContents);
-                break;
-            case EButtonType.Equip:
-                ItemContentsArr = new List<ItemSlotInfo>(II.EquipContents);
-                break;
-            case EButtonType.Etc:
-                ItemContentsArr = new List<ItemSlotInfo>(II.EtcContents);
-                break;
-            default:
-                break;
+            }
+        }
+        else
+        {
+            // ㅋㅋ 진짜 C#.....
+            foreach (var val in II[(EItemType)((int)EBType * 10^6)])
+            {
+                ItemContentsArr.Add(val.Value);
+            }
         }
     }
 
@@ -188,7 +168,7 @@ public class UIInventory : UIBase
         Color colorT;
         ColorUtility.TryParseHtmlString("#ffffff", out colorT);
 
-        EBType = (EButtonType)i;
+        EBType = (EInventorytype)i;
 
         switch (i)
         {

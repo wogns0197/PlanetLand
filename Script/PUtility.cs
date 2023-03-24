@@ -5,17 +5,18 @@ using UnityEngine;
 using UnityEditor; // for AssetPreview
 
 // parsing string to enum : Color c = (Color)Enum.Parse(typeof(Color), "Blue")
+
 public enum EItemType // max int 64
 {
-    Fashion = 1 << 14,
+    Fashion = EInventorytype.Fashion * 10^6,
 
-    Consume = 1 << 15,
-    Fish    = 1 << 15 | 1,
+    Consume = EInventorytype.Consume * 10^6,
+    Fish    = Consume | 1,
 
 
-    Equip   = 1 << 16,
+    Equip   = EInventorytype.Equip * 10^6,
 
-    Etc     = 1 << 17,
+    Etc     = EInventorytype.Etc * 10^6,
 }
 
 [Serializable]
@@ -26,10 +27,22 @@ public struct ItemSlotInfo
     public string Name;
     public EItemType Type;
     public string ThumbnailPath;
-}
 
-public struct InventoryInfo
+    // public Vector3 Pos; 위치변경 추후 추가 : All 고려해야함. All을 빼버리던가 해야할 듯
+
+    public ItemSlotInfo(int _ItemCode, int _Count, string _Name, EItemType _Type, string _ThumbnailPath)
+    {
+        this.ItemCode = _ItemCode;
+        this.Count = _Count;
+        this.Name = _Name;
+        this.Type = _Type;
+        this.ThumbnailPath = _ThumbnailPath;
+    }
+}
+public struct JsonInventoryInfo 
 {
+    // Only Use For Read Json!
+    // Json 파싱 이후, 탐색 속도와 접근용이를 위해 Dictionary InventoryInfo로 로드해줌
     public ItemSlotInfo[] FashionContents;
     public ItemSlotInfo[] ConsumeContents;
     public ItemSlotInfo[] EquipContents;
@@ -38,14 +51,53 @@ public struct InventoryInfo
 
 public class PUtility : MonoBehaviour
 {
+    public static Dictionary<EItemType, Dictionary<int, ItemSlotInfo>> _InventoryInfo;
+
+    void Start()
+    {
+        _InventoryInfo = new Dictionary<EItemType, Dictionary<int, ItemSlotInfo>>();
+        LoadInventoryInfoFromJson();
+    }
     static Dictionary<int, Texture2D> mStaticTexture = new Dictionary<int, Texture2D>();
-    public static InventoryInfo GetInventoryData()
+
+    public void LoadInventoryInfoFromJson()
     {
         TextAsset ta = Resources.Load<TextAsset>("Data/Dummy/CharacterInventoryData");
+        JsonInventoryInfo II = JsonUtility.FromJson<JsonInventoryInfo>(ta.text);
 
-        InventoryInfo II = JsonUtility.FromJson<InventoryInfo>(ta.text);
+        // 구조 진짜 이상한데...
+        Dictionary<int, ItemSlotInfo> Fashionslots = new Dictionary<int, ItemSlotInfo>();
+        for (int i = 0; i < II.FashionContents.Length; i++)
+        {
+            Fashionslots.Add(II.FashionContents[i].ItemCode, II.FashionContents[i]);
+        }
+        _InventoryInfo.Add(EItemType.Fashion, Fashionslots);
 
-        return II;
+        Dictionary<int, ItemSlotInfo> ConsumeSlots = new Dictionary<int, ItemSlotInfo>();
+        for (int i = 0; i < II.ConsumeContents.Length; i++)
+        {
+            ConsumeSlots.Add(II.ConsumeContents[i].ItemCode, II.ConsumeContents[i]);
+        }
+        _InventoryInfo.Add(EItemType.Consume, ConsumeSlots);
+
+        Dictionary<int, ItemSlotInfo> EquipSlots = new Dictionary<int, ItemSlotInfo>();
+        for (int i = 0; i < II.EquipContents.Length; i++)
+        {
+            EquipSlots.Add(II.EquipContents[i].ItemCode, II.EquipContents[i]);
+        }
+        _InventoryInfo.Add(EItemType.Equip, EquipSlots);
+
+        Dictionary<int, ItemSlotInfo> EtcSlots = new Dictionary<int, ItemSlotInfo>();
+        for (int i = 0; i < II.EtcContents.Length; i++)
+        {
+            EtcSlots.Add(II.EtcContents[i].ItemCode, II.EtcContents[i]);
+        }
+        _InventoryInfo.Add(EItemType.Etc, EtcSlots);
+    }
+
+    public static Dictionary<EItemType, Dictionary<int, ItemSlotInfo>> GetInventoryData()
+    {
+        return _InventoryInfo;
     }
 
     public static Sprite GetPreview(string path, int SN /*SerialNumber*/)

@@ -1,7 +1,7 @@
 {
     "FashionContents" : [
         {
-            "ItemCode" : 10001,
+            "ItemCode" : 100001,
             "Count" : 1,
             "Name" : "FID_Normal_0",
             "Type" : "Hat",
@@ -11,28 +11,28 @@
 
     "ConsumeContents" : [
         {
-            "ItemCode" : 20001,
+            "ItemCode" : 200001,
             "Count" : 4,
             "Name" : "Salmon",
             "Type" : "Fish",
             "ThumbnailPath": "Prefab/FishV1"
         },
         {
-            "ItemCode" : 20002,
+            "ItemCode" : 200002,
             "Count" : 3,
             "Name" : "Melowy",
             "Type" : "Fish",
             "ThumbnailPath": "Prefab/FishV4"
         },
         {
-            "ItemCode" : 20003,
+            "ItemCode" : 200003,
             "Count" : 1,
             "Name" : "Shark",
             "Type" : "Fish",
             "ThumbnailPath": "Prefab/FishV2"
         },
         {
-            "ItemCode" : 20004,
+            "ItemCode" : 200004,
             "Count" : 1,
             "Name" : "Gold Turtle",
             "Type" : "Fish",
@@ -41,7 +41,13 @@
     ],
 
     "EquipContents" : [
-
+        {
+            "ItemCode" : 300001,
+            "Count" : 1,
+            "Name" : "Ship",
+            "Type" : "Ship",
+            "ThumbnailPath": "Prefab/Ship"
+        }
     ],
 
     "EtcContents" : [
