@@ -49,94 +49,98 @@ public struct JsonInventoryInfo
     public ItemSlotInfo[] EtcContents;
 }
 
-public class PUtility : MonoBehaviour
+namespace Utility
 {
-    public static Dictionary<EItemType, Dictionary<int, ItemSlotInfo>> _InventoryInfo;
-
-    void Start()
+    using InventoryInfo = Dictionary<EItemType, Dictionary<int, ItemSlotInfo>>;
+    public class PUtility : MonoBehaviour
     {
-        _InventoryInfo = new Dictionary<EItemType, Dictionary<int, ItemSlotInfo>>();
-        LoadInventoryInfoFromJson();
-    }
-    static Dictionary<int, Texture2D> mStaticTexture = new Dictionary<int, Texture2D>();
+        public static InventoryInfo _InventoryInfo;
 
-    public void LoadInventoryInfoFromJson()
-    {
-        TextAsset ta = Resources.Load<TextAsset>("Data/Dummy/CharacterInventoryData");
-        JsonInventoryInfo II = JsonUtility.FromJson<JsonInventoryInfo>(ta.text);
-
-        // 구조 진짜 이상한데...
-        Dictionary<int, ItemSlotInfo> Fashionslots = new Dictionary<int, ItemSlotInfo>();
-        for (int i = 0; i < II.FashionContents.Length; i++)
+        void Start()
         {
-            Fashionslots.Add(II.FashionContents[i].ItemCode, II.FashionContents[i]);
+            _InventoryInfo = new InventoryInfo();
+            LoadInventoryInfoFromJson();
         }
-        _InventoryInfo.Add(EItemType.Fashion, Fashionslots);
+        static Dictionary<int, Texture2D> mStaticTexture = new Dictionary<int, Texture2D>();
 
-        Dictionary<int, ItemSlotInfo> ConsumeSlots = new Dictionary<int, ItemSlotInfo>();
-        for (int i = 0; i < II.ConsumeContents.Length; i++)
+        public void LoadInventoryInfoFromJson()
         {
-            ConsumeSlots.Add(II.ConsumeContents[i].ItemCode, II.ConsumeContents[i]);
-        }
-        _InventoryInfo.Add(EItemType.Consume, ConsumeSlots);
+            TextAsset ta = Resources.Load<TextAsset>("Data/Dummy/CharacterInventoryData");
+            JsonInventoryInfo II = JsonUtility.FromJson<JsonInventoryInfo>(ta.text);
 
-        Dictionary<int, ItemSlotInfo> EquipSlots = new Dictionary<int, ItemSlotInfo>();
-        for (int i = 0; i < II.EquipContents.Length; i++)
-        {
-            EquipSlots.Add(II.EquipContents[i].ItemCode, II.EquipContents[i]);
-        }
-        _InventoryInfo.Add(EItemType.Equip, EquipSlots);
-
-        Dictionary<int, ItemSlotInfo> EtcSlots = new Dictionary<int, ItemSlotInfo>();
-        for (int i = 0; i < II.EtcContents.Length; i++)
-        {
-            EtcSlots.Add(II.EtcContents[i].ItemCode, II.EtcContents[i]);
-        }
-        _InventoryInfo.Add(EItemType.Etc, EtcSlots);
-    }
-
-    public static Dictionary<EItemType, Dictionary<int, ItemSlotInfo>> GetInventoryData()
-    {
-        return _InventoryInfo;
-    }
-
-    public static Sprite GetPreview(string path, int SN /*SerialNumber*/)
-    {
-        if(path.Length == 0) { return null; }
-        Texture2D tx = null;
-        Sprite sp = null;
-        
-        GameObject target = Resources.Load(path) as GameObject;
-        if (target != null)
-        {
-            if (mStaticTexture.ContainsKey(SN))
+            // 구조 진짜 이상한데...
+            Dictionary<int, ItemSlotInfo> Fashionslots = new Dictionary<int, ItemSlotInfo>();
+            for (int i = 0; i < II.FashionContents.Length; i++)
             {
-                tx = mStaticTexture[SN];
+                Fashionslots.Add(II.FashionContents[i].ItemCode, II.FashionContents[i]);
             }
+            _InventoryInfo.Add(EItemType.Fashion, Fashionslots);
 
-            else 
+            Dictionary<int, ItemSlotInfo> ConsumeSlots = new Dictionary<int, ItemSlotInfo>();
+            for (int i = 0; i < II.ConsumeContents.Length; i++)
             {
-                if (Application.isPlaying)
-                    EditorUtility.SetDirty(target);
+                ConsumeSlots.Add(II.ConsumeContents[i].ItemCode, II.ConsumeContents[i]);
+            }
+            _InventoryInfo.Add(EItemType.Consume, ConsumeSlots);
 
-                tx = AssetPreview.GetAssetPreview(target);
-                int tries = 1000;
-                while (AssetPreview.IsLoadingAssetPreview(target.GetInstanceID()) && tries > 0)
+            Dictionary<int, ItemSlotInfo> EquipSlots = new Dictionary<int, ItemSlotInfo>();
+            for (int i = 0; i < II.EquipContents.Length; i++)
+            {
+                EquipSlots.Add(II.EquipContents[i].ItemCode, II.EquipContents[i]);
+            }
+            _InventoryInfo.Add(EItemType.Equip, EquipSlots);
+
+            Dictionary<int, ItemSlotInfo> EtcSlots = new Dictionary<int, ItemSlotInfo>();
+            for (int i = 0; i < II.EtcContents.Length; i++)
+            {
+                EtcSlots.Add(II.EtcContents[i].ItemCode, II.EtcContents[i]);
+            }
+            _InventoryInfo.Add(EItemType.Etc, EtcSlots);
+        }
+
+        public static Dictionary<EItemType, Dictionary<int, ItemSlotInfo>> GetInventoryData()
+        {
+            return _InventoryInfo;
+        }
+
+        public static Sprite GetPreview(string path, int SN /*SerialNumber*/)
+        {
+            if(path.Length == 0) { return null; }
+            Texture2D tx = null;
+            Sprite sp = null;
+            
+            GameObject target = Resources.Load(path) as GameObject;
+            if (target != null)
+            {
+                if (mStaticTexture.ContainsKey(SN))
                 {
-                    tries--;
+                    tx = mStaticTexture[SN];
                 }
 
-                mStaticTexture[SN] = tx;
+                else 
+                {
+                    if (Application.isPlaying)
+                        EditorUtility.SetDirty(target);
+
+                    tx = AssetPreview.GetAssetPreview(target);
+                    int tries = 1000;
+                    while (AssetPreview.IsLoadingAssetPreview(target.GetInstanceID()) && tries > 0)
+                    {
+                        tries--;
+                    }
+
+                    mStaticTexture[SN] = tx;
+                }
             }
+
+            else{
+                Debug.Log("NULL!!");
+            }
+
+            Rect rc = new Rect(0, 0, tx.width, tx.height);
+            sp = Sprite.Create(tx, rc, new Vector2(0.5f, 0.5f));
+
+            return sp;
         }
-
-        else{
-            Debug.Log("NULL!!");
-        }
-
-        Rect rc = new Rect(0, 0, tx.width, tx.height);
-        sp = Sprite.Create(tx, rc, new Vector2(0.5f, 0.5f));
-
-        return sp;
     }
 }

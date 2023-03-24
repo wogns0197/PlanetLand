@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.SceneManagement;
+using Utility;
 
 [System.Serializable]
 public class UnityAnimationEvent : UnityEvent<string>{};
@@ -318,7 +319,11 @@ private void OnCollisionEnter(Collision other)
 {
     if ( other.gameObject.layer == LayerMask.NameToLayer("Water") )
     {
-        // InventoryInfo II = PUtility.GetInventoryData();
+        // 하드코딩 300001 = ship
+        if ( PUtility.GetInventoryData()[EItemType.Equip].ContainsKey(300001) )
+        {
+            Debug.Log("!!");
+        }
     }
 }
 
