@@ -5,6 +5,14 @@ using UnityEngine.Events;
 using UnityEngine.SceneManagement;
 using Utility;
 
+enum ECharacterMoveType
+{
+    None,
+    Ship,
+    Car,
+    Fly,
+}
+
 [System.Serializable]
 public class UnityAnimationEvent : UnityEvent<string>{};
 [RequireComponent(typeof(Animator))]
@@ -63,6 +71,10 @@ private float fRotX, fRotY, fRotSpeed;
 //ui
 UIInstance UIInstance;
 
+//movetype
+ECharacterMoveType MoveType;
+GameObject Vehicle;
+
 void Awake()
 {
     DontDestroyOnLoad(this);
@@ -102,12 +114,14 @@ void Start()
     rg = this.GetComponent<Rigidbody>();
 
     UIInstance = UIInstance.GetUIInstance();
+
+    MoveType = ECharacterMoveType.None;
+    Vehicle = null;
 }
 
 void Update()
 {
-    Move();
-    Jump();
+    ProcessMove();
     ProcessAnim();
     UpdateCameraInput();
     ProcessUIInput();
@@ -138,6 +152,22 @@ void OnPickUp() { CharacterAnimData.bIsPickup = true; }
 void StopPickUp() { CharacterAnimData.bIsPickup = false; }
 void OnWave()   { CharacterAnimData.bIsWave = true; }
 void StopWave()   { CharacterAnimData.bIsWave = false; }
+void SetAnimIdle()
+{
+    StopWalk();
+    StopJump();
+    StopRun();
+    StopWave();
+}
+
+void ProcessMove()
+{
+    if ( MoveType == ECharacterMoveType.None )
+    {
+        Move();
+        Jump();
+    }
+}
 
 void ProcessAnim()
 {
@@ -157,9 +187,9 @@ void ProcessAnim()
         Animator.SetBool("bIsPickup", CharacterAnimData.bIsPickup );
     }
 }
+
 void Move()
 {
-    // w : 119, s : 115, d : 100, a : 97
     dMoveForward = 0;
     dRotLeft = 0;
     if ( Input.GetKey(KeyCode.W) )
@@ -317,12 +347,20 @@ void OnTriggerFieldObj(EFieldTrigger type)
 
 private void OnCollisionEnter(Collision other) 
 {
-    if ( other.gameObject.layer == LayerMask.NameToLayer("Water") )
+    if ( other.gameObject.layer == LayerMask.NameToLayer("Water") && Vehicle == null )
     {
+        SetAnimIdle();
+
         // 하드코딩 300001 = ship
         if ( PUtility.GetInventoryData()[EItemType.Equip].ContainsKey(300001) )
         {
+            MoveType = ECharacterMoveType.Ship;
             Debug.Log("!!");
+            ItemSlotInfo si = PUtility.GetInventoryData()[EItemType.Equip][300001];
+            Vehicle = Instantiate<GameObject>(
+                Resources.Load<GameObject>(si.Path),
+                this.transform.position,
+                Quaternion.Euler(-90, this.transform.rotation.y, 0) );
         }
     }
 }
@@ -334,6 +372,6 @@ void OnMoveMapbyPortal()
 
 void OnSceneLoaded(Scene scene, LoadSceneMode mode)
 {
-    this.transform.position = new Vector3(0, 5, 0); // 맵 마다 생성 포지션 다르게 해야함
+    this.transform.position = new Vector3(0, 10, 0); // 맵 마다 생성 포지션 다르게 해야함
 }
 }

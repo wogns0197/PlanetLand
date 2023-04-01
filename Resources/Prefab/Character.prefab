@@ -737,13 +737,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 12e570e3e2b5c0e41a4416529bea834b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Animator: {fileID: 1491590553101569573}
-  OnAnimationStart:
-    m_PersistentCalls:
-      m_Calls: []
-  OnAnimationComplete:
-    m_PersistentCalls:
-      m_Calls: []
   Camera: {fileID: 6038207346878297307}
 --- !u!114 &1491590553101569575
 MonoBehaviour:

@@ -5,7 +5,7 @@
             "Count" : 1,
             "Name" : "FID_Normal_0",
             "Type" : "Hat",
-            "ThumbnailPath": ""
+            "Path": ""
         }
     ],
 
@@ -15,28 +15,28 @@
             "Count" : 4,
             "Name" : "Salmon",
             "Type" : "Fish",
-            "ThumbnailPath": "Prefab/FishV1"
+            "Path": "Prefab/FishV1"
         },
         {
             "ItemCode" : 200002,
             "Count" : 3,
             "Name" : "Melowy",
             "Type" : "Fish",
-            "ThumbnailPath": "Prefab/FishV4"
+            "Path": "Prefab/FishV4"
         },
         {
             "ItemCode" : 200003,
             "Count" : 1,
             "Name" : "Shark",
             "Type" : "Fish",
-            "ThumbnailPath": "Prefab/FishV2"
+            "Path": "Prefab/FishV2"
         },
         {
             "ItemCode" : 200004,
             "Count" : 1,
             "Name" : "Gold Turtle",
             "Type" : "Fish",
-            "ThumbnailPath": "Prefab/SharkV1"
+            "Path": "Prefab/SharkV1"
         }
     ],
 
@@ -46,7 +46,7 @@
             "Count" : 1,
             "Name" : "Ship",
             "Type" : "Ship",
-            "ThumbnailPath": "Prefab/Ship"
+            "Path": "Prefab/Ship"
         }
     ],
 

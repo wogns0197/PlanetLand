@@ -26,17 +26,17 @@ public struct ItemSlotInfo
     public int Count;
     public string Name;
     public EItemType Type;
-    public string ThumbnailPath;
+    public string Path;
 
     // public Vector3 Pos; 위치변경 추후 추가 : All 고려해야함. All을 빼버리던가 해야할 듯
 
-    public ItemSlotInfo(int _ItemCode, int _Count, string _Name, EItemType _Type, string _ThumbnailPath)
+    public ItemSlotInfo(int _ItemCode, int _Count, string _Name, EItemType _Type, string _Path)
     {
         this.ItemCode = _ItemCode;
         this.Count = _Count;
         this.Name = _Name;
         this.Type = _Type;
-        this.ThumbnailPath = _ThumbnailPath;
+        this.Path = _Path;
     }
 }
 public struct JsonInventoryInfo 

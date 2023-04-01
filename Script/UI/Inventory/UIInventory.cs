@@ -106,7 +106,7 @@ public class UIInventory : UIBase
             {
                 if(ItemContentsArr[i].Count > 0)
                 {
-                    Sprite texture = PUtility.GetPreview(ItemContentsArr[i].ThumbnailPath, ItemContentsArr[i].ItemCode);
+                    Sprite texture = PUtility.GetPreview(ItemContentsArr[i].Path, ItemContentsArr[i].ItemCode);
                     cont.LoadData(texture, ItemContentsArr[i].Count);
                 }
             }

@@ -39,7 +39,7 @@ public class Ship : MonoBehaviour
 
             if (x != 0)
             {
-                
+                Debug.Log("!@#!@#!@!@#!@");
                 this.transform.rotation = Quaternion.Slerp(q, Quaternion.Euler(q.eulerAngles + new Vector3(0, 0, x*20 )), speed * Time.deltaTime);
             }
 
